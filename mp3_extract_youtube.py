@@ -1,10 +1,16 @@
 import json
 import os
+os.environ["PATH"] += ":/usr/local/bin"
 from yt_dlp import YoutubeDL
+
 
 def fetch_metadata_and_transcript(url: str, save_dir: str) -> tuple[dict, str]:
     """Fetch video metadata and transcript (if available) using yt-dlp."""
-    ydl_opts = {"quiet": True, "skip_download": True}
+    ydl_opts = {
+    "quiet": True,
+    "skip_download": True,
+    "js_runtime": "/usr/local/bin/node"}
+
     with YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
 
@@ -58,7 +64,10 @@ def download_audio(url: str, save_dir: str, output_file: str = "audio.mp3"):
             "preferredcodec": "mp3",
             "preferredquality": "192",
         }],
+        "js_runtime": "/usr/local/bin/node"
     }
+
+
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
 
