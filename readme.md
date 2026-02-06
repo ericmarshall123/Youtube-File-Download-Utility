@@ -39,44 +39,44 @@ Centralized worker class for clean architecture
 Metadata Extraction
 Retrieves detailed information without downloading the video:
 
-Video ID
+-Video ID
 
-Title
+-Title
 
-Uploader / Channel
+-Uploader / Channel
 
-View count
+-View count
 
-Like count
+-Like count
 
-Duration
+-Duration
 
-Upload date
+-Upload date
 
-Description
+-Description
 
-Tags
+-Tags
 
-Categories
+-Categories
 
-Original URL
+-Original URL
 
 Saved as metadata.json.
 
 Transcript Extraction
 If subtitles are available:
 
-English is preferred when available
+-English is preferred when available
 
-Falls back to the first available language
+-Falls back to the first available language
 
-Downloads .vtt subtitle file
+-Downloads .vtt subtitle file
 
-Converts it to plain text
+-Converts it to plain text
 
-Gracefully handles missing transcripts
+-Gracefully handles missing transcripts
 
-Saved as transcript.txt.
+-Saved as transcript.txt.
 
 # YouTube Metadata, Transcript & Audio Extractor (GUI Edition)
 
