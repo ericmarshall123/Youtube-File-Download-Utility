@@ -83,12 +83,10 @@ Saved as transcript.txt.
 A desktop application for extracting metadata, transcripts, and high‑quality MP3 audio from YouTube videos. The tool uses **PySide6** for the graphical interface, **yt‑dlp** for extraction, and a threaded backend to ensure a responsive user experience.
 
 This application is designed for researchers, analysts, archivists, and anyone who need structured YouTube data or offline audio access.
->>>>>>> 8b96488 (updated read me and added gui and worker files)
 
 High‑Quality MP3 Audio Download
 Downloads the best available audio stream
 
-<<<<<<< HEAD
 Converts to MP3 using FFmpeg
 
 Saves as audio.mp3 in the selected directory
