@@ -6,42 +6,37 @@ from yt_dlp import YoutubeDL
 # Environment Setup
 # ---------------------------------------------------------
 
-# Force Node to the front of PATH so yt-dlp can see it
 NODE_PATH = "/usr/local/bin/node"
-os.environ["PATH"] = f"/usr/local/bin:{os.environ['PATH']}"
+FFMPEG_PATH = "/Users/eric_marshall/opt/anaconda3/envs/ytproj/bin/ffmpeg"
+
+# Force PATH so yt-dlp sees Node + FFmpeg FIRST
+os.environ["PATH"] = (
+    f"/usr/local/bin:{FFMPEG_PATH}:{os.environ['PATH']}"
+)
 
 print(">>> RUNNING UPDATED SCRIPT <<<")
 print("PATH =", os.environ["PATH"])
 print("Using Node at:", NODE_PATH)
+print("Using FFmpeg at:", FFMPEG_PATH)
 
-# Shared yt-dlp JS runtime args
 JS_RUNTIME_ARGS = ["--js-runtime", f"node:{NODE_PATH}"]
 
 
-# ---------------------------------------------------------
-# Shared yt-dlp configuration builder
-# ---------------------------------------------------------
-
 def build_opts(**overrides):
-    """Return a yt-dlp options dict with JS runtime forced."""
+    """Return yt-dlp options with forced JS + FFmpeg."""
     base = {
         "quiet": False,
+        "noplaylist": True,  # <-- IMPORTANT FIX
         "postprocessor_args": {
             "default": JS_RUNTIME_ARGS
-        }
+        },
+        "ffmpeg_location": FFMPEG_PATH  # <-- FORCE FFmpeg
     }
     base.update(overrides)
     return base
 
 
-# ---------------------------------------------------------
-# Metadata + Transcript
-# ---------------------------------------------------------
-
 def fetch_metadata_and_transcript(url: str, save_dir: str):
-    """Fetch metadata and transcript if available."""
-    
-    # Metadata extraction
     ydl_opts = build_opts(skip_download=True)
     print("Metadata ydl_opts:", ydl_opts)
 
@@ -63,7 +58,6 @@ def fetch_metadata_and_transcript(url: str, save_dir: str):
         "url": url
     }
 
-    # Transcript extraction
     transcript_text = "No transcript available"
     subtitles = info.get("subtitles") or {}
 
@@ -90,12 +84,7 @@ def fetch_metadata_and_transcript(url: str, save_dir: str):
     return metadata, transcript_text
 
 
-# ---------------------------------------------------------
-# Audio Download
-# ---------------------------------------------------------
-
 def download_audio(url: str, save_dir: str, output_file: str = "audio.mp3"):
-    """Download audio as MP3."""
     output_path = os.path.join(save_dir, output_file)
 
     ydl_opts = build_opts(
@@ -113,10 +102,6 @@ def download_audio(url: str, save_dir: str, output_file: str = "audio.mp3"):
         ydl.download([url])
 
 
-# ---------------------------------------------------------
-# Main
-# ---------------------------------------------------------
-
 def main():
     url = input("Enter the YouTube URL: ").strip()
     save_dir = input("Enter the directory to save files: ").strip()
@@ -125,19 +110,16 @@ def main():
 
     metadata, transcript = fetch_metadata_and_transcript(url, save_dir)
 
-    # Save metadata
     metadata_file = os.path.join(save_dir, "metadata.json")
     with open(metadata_file, "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=4, ensure_ascii=False)
     print(f"Metadata saved to {metadata_file}")
 
-    # Save transcript
     transcript_file = os.path.join(save_dir, "transcript.txt")
     with open(transcript_file, "w", encoding="utf-8") as f:
         f.write(transcript)
     print(f"Transcript saved to {transcript_file}")
 
-    # Save audio
     download_audio(url, save_dir, "audio.mp3")
     print(f"Audio saved to {os.path.join(save_dir, 'audio.mp3')}")
 
