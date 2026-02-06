@@ -1,17 +1,22 @@
 import sys
 import os
+import json
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QLineEdit, QPushButton, QFileDialog,
-    QTextEdit, QProgressBar
+    QTextEdit, QProgressBar, QMessageBox
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QThread
+
+import yt_backend
+from yt_worker import YTWorker
+
 
 class YouTubeUtility(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("YouTube Utility (PySide6)")
-        self.setMinimumSize(600, 400)
+        self.setMinimumSize(700, 500)
 
         layout = QVBoxLayout()
 
@@ -63,6 +68,10 @@ class YouTubeUtility(QWidget):
 
         self.setLayout(layout)
 
+    # ---------------------------------------------------------
+    # Helpers
+    # ---------------------------------------------------------
+
     def pick_directory(self):
         folder = QFileDialog.getExistingDirectory(self, "Select Folder")
         if folder:
@@ -71,16 +80,119 @@ class YouTubeUtility(QWidget):
     def log_message(self, text):
         self.log.append(text)
 
-    # Placeholder methods — we will wire these up next
+    def _get_inputs(self):
+        url = self.url_input.text().strip()
+        save_dir = self.dir_input.text().strip()
+
+        if not url:
+            QMessageBox.warning(self, "Missing URL", "Please enter a YouTube URL.")
+            return None, None
+
+        if not save_dir:
+            QMessageBox.warning(self, "Missing Directory", "Please choose a save directory.")
+            return None, None
+
+        os.makedirs(save_dir, exist_ok=True)
+        return url, save_dir
+
+    # ---------------------------------------------------------
+    # Worker Thread System
+    # ---------------------------------------------------------
+
+    def start_worker(self, url, opts):
+        self.progress.setValue(0)
+
+        self.thread = QThread()
+        self.worker = YTWorker(url, opts)
+        self.worker.moveToThread(self.thread)
+
+        # Connect signals
+        self.thread.started.connect(self.worker.run)
+        self.worker.progress.connect(self.progress.setValue)
+        self.worker.log.connect(self.log_message)
+        self.worker.error.connect(self._on_error)
+        self.worker.finished.connect(self._on_finished)
+
+        # Cleanup
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.thread.finished.connect(self.thread.deleteLater)
+
+        self.thread.start()
+
+    def _on_error(self, msg):
+        self.log_message("ERROR: " + msg)
+        QMessageBox.critical(self, "Error", msg)
+
+    def _on_finished(self):
+        self.log_message("Done.")
+        self.progress.setValue(100)
+
+    # ---------------------------------------------------------
+    # Button Handlers
+    # ---------------------------------------------------------
+
     def download_metadata(self):
-        self.log_message("Metadata download not implemented yet.")
+        url, save_dir = self._get_inputs()
+        if not url:
+            return
+
+        self.log_message("Fetching metadata...")
+
+        try:
+            metadata, _ = yt_backend.fetch_metadata(url)
+            path = os.path.join(save_dir, "metadata.json")
+
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(metadata, f, indent=4, ensure_ascii=False)
+
+            self.log_message(f"Metadata saved to {path}")
+
+        except Exception as e:
+            self._on_error(str(e))
 
     def download_transcript(self):
-        self.log_message("Transcript download not implemented yet.")
+        url, save_dir = self._get_inputs()
+        if not url:
+            return
+
+        self.log_message("Fetching transcript...")
+
+        try:
+            metadata, transcript = yt_backend.fetch_transcript(url, save_dir)
+            path = os.path.join(save_dir, "transcript.txt")
+
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(transcript)
+
+            self.log_message(f"Transcript saved to {path}")
+
+        except Exception as e:
+            self._on_error(str(e))
 
     def download_audio(self):
-        self.log_message("Audio download not implemented yet.")
+        url, save_dir = self._get_inputs()
+        if not url:
+            return
 
+        self.log_message("Starting audio download...")
+
+        opts = yt_backend.build_opts({
+            "format": "bestaudio/best",
+            "outtmpl": os.path.join(save_dir, "audio.mp3"),
+            "postprocessors": [{
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "mp3",
+                "preferredquality": "192",
+            }]
+        })
+
+        self.start_worker(url, opts)
+
+
+# ---------------------------------------------------------
+# Main
+# ---------------------------------------------------------
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
