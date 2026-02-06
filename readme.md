@@ -15,19 +15,19 @@ Features
 Modern PySide6 Desktop Interface
 Clean, responsive Qt‑based GUI
 
-URL input field
+- URL input field
 
-Directory picker
+- Directory picker
 
-Buttons for metadata, transcript, and audio extraction
+- Buttons for metadata, transcript, and audio extraction
 
-Real‑time progress bar
+- Real‑time progress bar
 
-Scrollable log output
+- Scrollable log output
 
-Error popups and status messages
+- Error popups and status messages
 
-Threaded yt‑dlp Backend
+- Threaded yt‑dlp Backend
 All downloads run in background threads
 
 GUI remains responsive
@@ -85,33 +85,33 @@ A desktop application for extracting metadata, transcripts, and high‑quality M
 This application is designed for researchers, analysts, archivists, and anyone who need structured YouTube data or offline audio access.
 
 High‑Quality MP3 Audio Download
-Downloads the best available audio stream
+- Downloads the best available audio stream
 
-Converts to MP3 using FFmpeg
+- Converts to MP3 using FFmpeg
 
-Saves as audio.mp3 in the selected directory
+- Saves as audio.mp3 in the selected directory
 
 Clean Project Architecture
-The application is organized into three main components:
+- The application is organized into three main components:
 
-yt_gui.py — PySide6 GUI
+- yt_gui.py — PySide6 GUI
 
-yt_backend.py — metadata, transcript, and audio logic
+- yt_backend.py — metadata, transcript, and audio logic
 
-yt_worker.py — threaded yt‑dlp worker with progress hooks
+- yt_worker.py — threaded yt‑dlp worker with progress hooks
 
-This structure keeps the project modular and easy to extend.
+- This structure keeps the project modular and easy to extend.
 
 Tech Stack
-Python 3.11+
+- Python 3.11+
 
-PySide6 (Qt6)
+- PySide6 (Qt6)
 
-yt‑dlp
+- yt‑dlp
 
-FFmpeg
+- FFmpeg
 
-Node.js (required for YouTube’s JavaScript‑based extraction)
+- Node.js (required for YouTube’s JavaScript‑based extraction)
 
 How to Use the Application
 1. Enter a YouTube URL
