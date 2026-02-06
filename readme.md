@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # YouTube Metadata, Transcript & Audio Extractor (GUI Edition)
 
 A desktop application for extracting metadata, transcripts, and high‑quality MP3 audio from YouTube videos. The tool uses **PySide6** for the graphical interface, **yt‑dlp** for extraction, and a threaded backend to ensure a responsive user experience.
@@ -7,8 +6,6 @@ This application is designed for researchers, analysts, archivists, and anyone w
 
 ## Features
 
-=======
-<<<<<<< HEAD
 YouTube Metadata, Transcript & Audio Extractor (GUI Edition)
 A desktop application for extracting metadata, transcripts, and high‑quality MP3 audio from YouTube videos. The tool uses PySide6 for the graphical interface, yt‑dlp for extraction, and a threaded backend to ensure a responsive user experience.
 
@@ -80,7 +77,7 @@ Converts it to plain text
 Gracefully handles missing transcripts
 
 Saved as transcript.txt.
-=======
+
 # YouTube Metadata, Transcript & Audio Extractor (GUI Edition)
 
 A desktop application for extracting metadata, transcripts, and high‑quality MP3 audio from YouTube videos. The tool uses **PySide6** for the graphical interface, **yt‑dlp** for extraction, and a threaded backend to ensure a responsive user experience.
@@ -152,9 +149,7 @@ Offline listening
 Media organization workflows
 
 Project Structure
-Code
-=======
->>>>>>> 572591a
+
 ### Modern PySide6 Desktop Interface
 - Clean, responsive Qt‑based GUI
 - URL input field
@@ -246,19 +241,15 @@ All status messages and yt‑dlp output appear in the log window.
 ## Project Structure
 
 ### Code
-<<<<<<< HEAD
-=======
->>>>>>> 8b96488 (updated read me and added gui and worker files)
->>>>>>> 572591a
+
 youtubeutility/
 │
 ├── yt_gui.py          # PySide6 GUI application
 ├── yt_backend.py      # Metadata, transcript, and audio logic
 ├── yt_worker.py       # Threaded yt-dlp worker with progress hooks
 └── README.md          # Project documentation
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
+
+
 Planned Enhancements
 Playlist controls (first video only, full playlist, or range selection)
 
@@ -274,7 +265,6 @@ Windows/Linux builds
 
 Dark mode UI
 =======
->>>>>>> 572591a
 
 ## Planned Enhancements
 - Playlist controls (first video only, full playlist, or range selection)
@@ -284,7 +274,4 @@ Dark mode UI
 - macOS .app packaging
 - Windows/Linux builds
 - Dark mode UI
-<<<<<<< HEAD
-=======
->>>>>>> 8b96488 (updated read me and added gui and worker files)
->>>>>>> 572591a
+
