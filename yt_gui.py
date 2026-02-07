@@ -106,14 +106,12 @@ class YouTubeUtility(QWidget):
         self.worker = YTWorker(url, opts)
         self.worker.moveToThread(self.thread)
 
-        # Connect signals
         self.thread.started.connect(self.worker.run)
         self.worker.progress.connect(self.progress.setValue)
         self.worker.log.connect(self.log_message)
         self.worker.error.connect(self._on_error)
         self.worker.finished.connect(self._on_finished)
 
-        # Cleanup
         self.worker.finished.connect(self.thread.quit)
         self.worker.finished.connect(self.worker.deleteLater)
         self.thread.finished.connect(self.thread.deleteLater)
@@ -140,13 +138,11 @@ class YouTubeUtility(QWidget):
         self.log_message("Fetching metadata...")
 
         try:
-            metadata, _ = yt_backend.fetch_metadata(url)
-            path = os.path.join(save_dir, "metadata.json")
+            metadata, info = yt_backend.fetch_metadata(url)
+            title = yt_backend.sanitize_filename(metadata["title"])
+            json_path = yt_backend.save_metadata_json(metadata, save_dir, title)
 
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump(metadata, f, indent=4, ensure_ascii=False)
-
-            self.log_message(f"Metadata saved to {path}")
+            self.log_message(f"Metadata saved to {json_path}")
 
         except Exception as e:
             self._on_error(str(e))
@@ -159,13 +155,13 @@ class YouTubeUtility(QWidget):
         self.log_message("Fetching transcript...")
 
         try:
-            metadata, transcript = yt_backend.fetch_transcript(url, save_dir)
-            path = os.path.join(save_dir, "transcript.txt")
+            metadata, info = yt_backend.fetch_metadata(url)
+            title = yt_backend.sanitize_filename(metadata["title"])
 
-            with open(path, "w", encoding="utf-8") as f:
-                f.write(transcript)
+            transcript = yt_backend.fetch_transcript(url, save_dir, title, info)
 
-            self.log_message(f"Transcript saved to {path}")
+            txt_path = os.path.join(save_dir, f"{title}.txt")
+            self.log_message(f"Transcript saved to {txt_path}")
 
         except Exception as e:
             self._on_error(str(e))
@@ -177,17 +173,17 @@ class YouTubeUtility(QWidget):
 
         self.log_message("Starting audio download...")
 
-        opts = yt_backend.build_opts({
-            "format": "bestaudio/best",
-            "outtmpl": os.path.join(save_dir, "audio.mp3"),
-            "postprocessors": [{
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": "192",
-            }]
-        })
+        try:
+            metadata, info = yt_backend.fetch_metadata(url)
+            title = yt_backend.sanitize_filename(metadata["title"])
+            uploader = metadata["uploader"]
 
-        self.start_worker(url, opts)
+            audio_path = yt_backend.download_audio(url, save_dir, title, uploader)
+
+            self.log_message(f"Audio saved to {audio_path}")
+
+        except Exception as e:
+            self._on_error(str(e))
 
 
 # ---------------------------------------------------------
