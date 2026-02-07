@@ -8,3 +8,5 @@ pip install -r requirements.txt
 pip install -r requirements-dev.txt
 
 echo "Environment setup complete."
+
+python yt_gui.py
